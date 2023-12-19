@@ -1,12 +1,14 @@
 import {useTheme} from '@emotion/react';
 import Editor, {useMonaco} from '@monaco-editor/react';
 import {MenuItem, Paper, Select, Typography, Button, Container, Box} from '@mui/material';
-import {useEffect, useRef, useState} from 'react';
-import {Languages} from "../utils/enums.js";
+import {useContext, useEffect, useRef, useState} from 'react';
+import {Languages} from "../../utils/enums.js";
+import { ProblemContext } from '../../contexts/ProblemContext.js';
 export const CodeEditor = (props) => {
     const theme = useTheme()
     const editorRef = useRef(null)
     const [language, setLanguage] = useState(Languages.javascript)
+    const {problem} = useContext(ProblemContext);
     const onEditorMount = (editor, monaco) => {
         editorRef.current = editor
     }
@@ -56,12 +58,6 @@ export const CodeEditor = (props) => {
     return (
         <Box sx={{
             height: '85vh',
-            width: '50vw',
-            position: 'absolute',
-            right: 0,
-            top: 0,
-            bottom: 0,
-            m: 0
         }}>
             <Paper sx={{
                 backgroundColor: "primary.light",
@@ -83,7 +79,8 @@ export const CodeEditor = (props) => {
                 }
             </Select></Paper>
             <Editor onMount={onEditorMount} onChange={props.onChange}
-                    defaultLanguage={language} theme='vs-dark'></Editor>
+                    value={problem != null? problem.defaultCodes[language]: ''}
+                    defaultLanguage={language} theme='vs-dark' language={language}></Editor>
             <Paper elevation={2} sx={{
                 backgroundColor: 'primary.light',
                 padding: 1,
