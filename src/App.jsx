@@ -12,12 +12,12 @@ import {
     BrowserRouter,
     createBrowserRouter,
     Route,
-    RouterProvider,
     Routes
   } from "react-router-dom";
 import { DrawerAppBar } from './components/DrawerAppBar';
 import LoginPage from './components/authentication/Login';
 import RegisterPage from './components/authentication/Register';
+import ProblemForm from './components/problem_form/ProblemForm';
 
 
 function App() {
@@ -65,12 +65,13 @@ function App() {
     return (
         <ThemeProvider theme={theme}>
             <BrowserRouter>
-                <DrawerAppBar/>
+                <Box sx={{mb:6}}><DrawerAppBar/></Box>
                 <Routes>
                     <Route path='/' element={<ProblemListContextProvider><ProblemList /></ProblemListContextProvider>}/>
                     <Route path='/problems/:id' element={<ProblemContextProvider><ProblemViewer></ProblemViewer></ProblemContextProvider>}/>
                     <Route path='/login' element={<LoginPage/>}/>
                     <Route path='/register' element={<RegisterPage/>}/>
+                    <Route path='/admin/problems/add' element={<ProblemForm />} />
                 </Routes>
             </BrowserRouter>
         </ThemeProvider>

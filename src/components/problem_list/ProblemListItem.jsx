@@ -2,6 +2,7 @@ import { Box,  Typography, useTheme} from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2'
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { capitalise } from '../../utils/methods'
 
 function ProblemListItem(props) {
     const difficultyColorMap = {
@@ -31,7 +32,7 @@ function ProblemListItem(props) {
                 <Grid xs={2} ><Typography variant='h6' sx= {{
                     color: difficultyColorMap[props.problem.difficulty],
                     align: 'center' 
-                }}>{props.problem.difficulty}</Typography></Grid>
+                }}>{capitalise(props.problem.difficulty)}</Typography></Grid>
                 <Grid xs={2}><Typography variant='h6' textAlign={'center'}>{props.problem.acceptancePercent}%</Typography></Grid>
             </Grid>
         </Box>

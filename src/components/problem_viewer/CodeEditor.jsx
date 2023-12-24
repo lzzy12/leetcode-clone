@@ -1,16 +1,16 @@
 import {useTheme} from '@emotion/react';
-import Editor, {useMonaco} from '@monaco-editor/react';
-import {MenuItem, Paper, Select, Typography, Button, Container, Box} from '@mui/material';
-import {useContext, useEffect, useRef, useState} from 'react';
+import { Paper,  Button, Box} from '@mui/material';
+import {forwardRef, useContext, useState} from 'react';
 import {Languages} from "../../utils/enums.js";
 import { ProblemContext } from '../../contexts/ProblemContext.js';
-export const CodeEditor = (props) => {
+import AppDropDown from '../common/AppDropDown.jsx';
+import { Editor } from '@monaco-editor/react';
+export const CodeEditor = forwardRef((props, ref) => {
     const theme = useTheme()
-    const editorRef = useRef(null)
-    const [language, setLanguage] = useState(Languages.javascript)
+    const [language, setLanguage] = useState(Languages.CPP)
     const {problem} = useContext(ProblemContext);
     const onEditorMount = (editor, monaco) => {
-        editorRef.current = editor
+        ref.current = editor
     }
 
     const onSubmit = async () => {
@@ -18,7 +18,7 @@ export const CodeEditor = (props) => {
             await fetch('http://localhost:8080/submit', {
                 method: 'POST',
                 body: {
-                    code: editorRef.current.getValue(),
+                    code: ref.current.getValue(),
                     lang: language,
                     problem: props.problemId,
                 }
@@ -33,7 +33,7 @@ export const CodeEditor = (props) => {
             await fetch('http://localhost:8080/run', {
                 method: 'POST',
                 body: {
-                    code: editorRef.current.getValue(),
+                    code: ref.current.getValue(),
                     lang: language,
                     problem: props.problemId,
                 }
@@ -42,8 +42,8 @@ export const CodeEditor = (props) => {
             console.log(e);
         }
     }
-    const onChangeLanguage = (event) => {
-        setLanguage(event.target.value)
+    const onChangeLanguage = (lang) => {
+        setLanguage(lang);
     }
 
     // useEffect(() => {
@@ -57,27 +57,16 @@ export const CodeEditor = (props) => {
     // }, [])
     return (
         <Box sx={{
-            height: '85vh',
+            height: '85%',
         }}>
             <Paper sx={{
                 backgroundColor: "primary.light",
                 padding: 1
-            }}><Select sx={{
-                height: "30px",
-                width: "130px",
-                display: 'flex',
-                backgroundColor: "primary.light"
-            }} onChange={onChangeLanguage} value={language}>
+            }}>
 
-                {
-                    ...(Object.keys(Languages).map((key) => {
-                        return <MenuItem value={Languages[key]} key={key} sx={{
-                            backgroundColor: "primary.light"
-                        }}><Typography
-                            variant="body1" color="white">{Languages[key]}</Typography></MenuItem>
-                    }))
-                }
-            </Select></Paper>
+            <AppDropDown onChange={onChangeLanguage} value={language} choices={Languages}/>
+
+            </Paper>
             <Editor onMount={onEditorMount} onChange={props.onChange}
                     value={problem != null? problem.defaultCodes[language]: ''}
                     defaultLanguage={language} theme='vs-dark' language={language}></Editor>
@@ -85,7 +74,8 @@ export const CodeEditor = (props) => {
                 backgroundColor: 'primary.light',
                 padding: 1,
                 display: 'flex',
-                flexDirection: 'row'
+                flexDirection: 'row',
+                visibility: (props.consoleVisible ?? true) ? 'visible' : 'hidden'
             }}><Button variant="outlined" onClick={onSubmit} sx={{
                 backgroundColor: 'action.active',
                 color: 'white',
@@ -109,4 +99,4 @@ export const CodeEditor = (props) => {
             }}>Run</Button></Paper>
         </Box>
     )
-}
+})

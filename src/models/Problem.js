@@ -1,6 +1,6 @@
 export class Problem {
     static ProblemParser(data) {
-        return new Problem(data.id, data.name, data.description, data.defaultCodes, data.difficulty)
+        return new Problem(data._id, data.name, data.description, data.defaultCodes, data.difficulty)
     }
 
     constructor(id, name, description, defaultCodes, difficulty) {
