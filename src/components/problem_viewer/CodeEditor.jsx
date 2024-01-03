@@ -11,8 +11,15 @@ export const CodeEditor = forwardRef((props, ref) => {
     const {problem} = useContext(ProblemContext);
     const onEditorMount = (editor, monaco) => {
         ref.current = editor
+        if (props.onEditorMount !== undefined)
+            props.onEditorMount(editor);
     }
-
+    const onChange = (value, editor) => {
+        if (props.onChange !== undefined){
+            props.onChange(value);
+            console.log('on change called');
+        }
+    }
     const onSubmit = async () => {
         try {
             await fetch('http://localhost:8080/submit', {
@@ -67,7 +74,7 @@ export const CodeEditor = forwardRef((props, ref) => {
             <AppDropDown onChange={onChangeLanguage} value={language} choices={Languages}/>
 
             </Paper>
-            <Editor onMount={onEditorMount} onChange={props.onChange}
+            <Editor onMount={onEditorMount} onChange={onChange}
                     value={problem != null? problem.defaultCodes[language]: ''}
                     defaultLanguage={language} theme='vs-dark' language={language}></Editor>
             <Paper elevation={2} sx={{

@@ -18,6 +18,7 @@ import { DrawerAppBar } from './components/DrawerAppBar';
 import LoginPage from './components/authentication/Login';
 import RegisterPage from './components/authentication/Register';
 import ProblemForm from './components/problem_form/ProblemForm';
+import ProblemEditForm from './components/problem_form/ProblemEditForm';
 
 
 function App() {
@@ -72,6 +73,7 @@ function App() {
                     <Route path='/login' element={<LoginPage/>}/>
                     <Route path='/register' element={<RegisterPage/>}/>
                     <Route path='/admin/problems/add' element={<ProblemForm />} />
+                    <Route path='/admin/problems/edit/:id' element={<ProblemContextProvider><ProblemEditForm/></ProblemContextProvider>}/>
                 </Routes>
             </BrowserRouter>
         </ThemeProvider>

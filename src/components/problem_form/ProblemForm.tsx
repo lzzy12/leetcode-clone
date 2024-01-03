@@ -16,51 +16,67 @@ function ProblemForm() {
     const solutionCodeRef = useRef(null);
     let [problemTitle, setProblemTitle] = useState('')
     let [problemDesc, setProblemDesc] = useState('');
+    let [testCases, setTestCases] = useState('');
     let [isLoading, setIsLoading] = useState(false);
+    let startingCode = ''
+    let solutionCode = ''
     const saveProblemForm = async () => {
         const problemDescription = problemDesc;
         if (startingCodeRef.current === null || solutionCodeRef.current === null) {
             console.log('Code editor is not ready or something else went wrong');
             return;
         }
-        const startingCode = startingCodeRef.current.getValue();
-        const solutionCode = solutionCodeRef.current.getValue();
         localStorage.setItem('draft-problem', JSON.stringify({
-                name: problemTitle,
-                description: problemDescription,
-                difficulty,
-                defaultCodes: [{
-                    language: Languages.CPP,
-                    code: startingCode,
-                }],
-                solutionLanguage: Languages.CPP,
-                solutionCode: solutionCode
+            name: problemTitle,
+            description: problemDescription,
+            difficulty,
+            defaultCodes: [{
+                language: Languages.CPP,
+                code: startingCode,
+            }],
+            solutionLanguage: Languages.CPP,
+            solutionCode: solutionCode,
+            testCases
         }))
     }
-    setTimeout(() => {
-        setInterval(saveProblemForm, 5000);
-    }, 5000);
     useEffect(() => {
-        if (localStorage.getItem('draft-problem') !== null){
-            setTimeout(() => {const draftProblem = JSON.parse(localStorage.getItem('draft-problem')!);
-            if (draftProblem !== null){
-                setProblemTitle(draftProblem.name)
-                setProblemDesc(draftProblem.description);
-                setDifficulty(draftProblem.difficulty);
-                startingCodeRef.current.setValue(draftProblem.defaultCodes[0].code)
-                solutionCodeRef.current.setValue(draftProblem.solutionCode)
-            }}, 2000)
+        saveProblemForm();
+    }, [problemTitle, problemDesc, testCases, difficulty, solutionCode, startingCode])
+    const restoreStartingCode = (editor) => {
+        if (localStorage.getItem('draft-problem') !== null) {
+            const draftProblem = JSON.parse(localStorage.getItem('draft-problem')!);
+            if (draftProblem !== null) {
+                editor.setValue(draftProblem.defaultCodes[0].code)
+            }
+        }
+    }
+    const restoreSolCode = (editor) => {
+        if (localStorage.getItem('draft-problem') !== null) {
+            const draftProblem = JSON.parse(localStorage.getItem('draft-problem')!);
+            if (draftProblem !== null) {
+                editor.setValue(draftProblem.solutionCode)
+            }
+        }
+    }
+    useEffect(() => {
+        if (localStorage.getItem('draft-problem') !== null) {
+                const draftProblem = JSON.parse(localStorage.getItem('draft-problem')!);
+                if (draftProblem !== null) {
+                    setProblemTitle(draftProblem.name)
+                    setProblemDesc(draftProblem.description);
+                    setDifficulty(draftProblem.difficulty);
+                    setTestCases(draftProblem.testCases);
+                }
         }
     }, [])
+    
     const submitProblemForm = async () => {
         const problemDescription = problemDesc;
         if (startingCodeRef.current === null || solutionCodeRef.current === null) {
             console.log('Code editor is not ready or something else went wrong');
             return;
         }
-        const startingCode = startingCodeRef.current.getValue();
-        const solutionCode = solutionCodeRef.current.getValue()
-        try{
+        try {
             setIsLoading(true);
             const res = await client.post('/problems', {
                 name: problemTitle,
@@ -71,23 +87,24 @@ function ProblemForm() {
                     code: startingCode,
                 }],
                 solutionLanguage: Languages.CPP,
-                solutionCode: solutionCode
+                solutionCode,
+                testCases
             }, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     'Content-Type': 'application/json',
                 },
                 withCredentials: false
-                
+
             });
             // const navigate = useNavigate();
             // navigate(`/problems/${res.data.id}`)
-        } catch(e){
+        } catch (e) {
             console.log(e);
-        } finally{
+        } finally {
             setIsLoading(false);
         }
-        
+
     }
     return (
         <Grid container spacing={2} style={{
@@ -104,7 +121,7 @@ function ProblemForm() {
                 } onChange={(event) => {
                     setProblemTitle(event.target.value);
                     console.log(event.target.value)
-                }} value={problemTitle}/> <br />
+                }} value={problemTitle} /> <br />
                 <AppDropDown choices={{
                     Easy: 'easy',
                     Medium: 'medium',
@@ -119,7 +136,12 @@ function ProblemForm() {
                     }}
                     data={problemDesc}
                 />
-
+                <Box sx={{
+                    textAlign: 'start',
+                    mt: 2
+                }}><TextareaAutosize minRows={10} placeholder='Test cases' style={{ width: '100%' }} onChange={(event) => {
+                    setTestCases(event.target.value);
+                }} value={testCases} /></Box>
             </Grid>
             <Grid xs={6} justifyContent={'start'} sx={{
                 height: '100vh'
@@ -127,13 +149,13 @@ function ProblemForm() {
 
                 <Grid container direction={'column'}>
                     <Grid>Starter Codes: </Grid>
-                    <Grid xs={5} height={'45vh'}><ProblemContextProvider><CodeEditor ref={startingCodeRef} consoleVisible={false} /></ProblemContextProvider></Grid>
+                    <Grid xs={5} height={'45vh'}><ProblemContextProvider><CodeEditor onEditorMount={restoreStartingCode} ref={startingCodeRef} consoleVisible={false} onChange={(code) => { startingCode = code}}/></ProblemContextProvider></Grid>
                     <Grid>Solution Code: </Grid>
-                    <Grid xs={5} height={'50vh'}><ProblemContextProvider><CodeEditor ref={solutionCodeRef} consoleVisible={false} /></ProblemContextProvider></Grid>
+                    <Grid xs={5} height={'50vh'}><ProblemContextProvider><CodeEditor onEditorMount={restoreSolCode} ref={solutionCodeRef} consoleVisible={false} onChange={(code) => { solutionCode = code}} /></ProblemContextProvider></Grid>
                 </Grid>
             </Grid>
             <Grid>
-                { isLoading? <CircularProgress/>: <Button variant='contained' onClick={submitProblemForm}>Submit</Button>}
+                {isLoading ? <CircularProgress /> : <Button variant='contained' onClick={submitProblemForm}>Submit</Button>}
             </Grid>
             <Grid>
                 <Button variant='contained' onClick={saveProblemForm}>Save</Button>
