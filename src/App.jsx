@@ -19,7 +19,9 @@ import LoginPage from './components/authentication/Login';
 import RegisterPage from './components/authentication/Register';
 import ProblemForm from './components/problem_form/ProblemForm';
 import ProblemEditForm from './components/problem_form/ProblemEditForm';
-
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { googleClientId } from './utils/configs';
+import { AuthenticationTokenProvider } from './contexts/providers/AuthenticationTokenProvider';
 
 function App() {
 
@@ -44,7 +46,12 @@ function App() {
             primary: {
                 main: "#282828",
                 light: "#303030",
-                dark: "#1A1A1A"
+                dark: "#1A1A1A",
+                grey: "#C7C2A9",
+            },
+            text: {
+                primary: '#000000',
+                secondary: 'grey'
             },
             background: {
                 default: "#1A1A1A"
@@ -65,17 +72,23 @@ function App() {
     },)
     return (
         <ThemeProvider theme={theme}>
+                    <AuthenticationTokenProvider>
+
             <BrowserRouter>
-                <Box sx={{mb:6}}><DrawerAppBar/></Box>
-                <Routes>
-                    <Route path='/' element={<ProblemListContextProvider><ProblemList /></ProblemListContextProvider>}/>
-                    <Route path='/problems/:id' element={<ProblemContextProvider><ProblemViewer></ProblemViewer></ProblemContextProvider>}/>
-                    <Route path='/login' element={<LoginPage/>}/>
-                    <Route path='/register' element={<RegisterPage/>}/>
-                    <Route path='/admin/problems/add' element={<ProblemForm />} />
-                    <Route path='/admin/problems/edit/:id' element={<ProblemContextProvider><ProblemEditForm/></ProblemContextProvider>}/>
-                </Routes>
+                    <Box sx={{mb:6}}><DrawerAppBar/></Box>
+                    <Routes>
+
+                        <Route path='/' element={<ProblemListContextProvider><ProblemList /></ProblemListContextProvider>}/>
+                        <Route path='/problems/:id' element={<ProblemContextProvider><ProblemViewer></ProblemViewer></ProblemContextProvider>}/>
+                        <Route path='/login' element={<LoginPage/>}/>
+                        <Route path='/register' element={<RegisterPage/>}/>
+                        <Route path='/admin/problems/add' element={<ProblemForm />} />
+                        <Route path='/admin/problems/edit/:id' element={<ProblemContextProvider><ProblemEditForm/></ProblemContextProvider>}/>
+                    
+                    </Routes>
             </BrowserRouter>
+            </AuthenticationTokenProvider>
+
         </ThemeProvider>
 
     )

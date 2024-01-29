@@ -1,8 +1,32 @@
 import { Box, Button, Input, TextField, Typography } from '@mui/material'
-import React from 'react'
+import React, { useContext, useEffect } from 'react'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 import { Link } from 'react-router-dom'
+import { GoogleLogin, useGoogleLogin } from '@react-oauth/google'
+import { FacebookLoginButton, GoogleLoginButton, TwitterLoginButton } from 'react-social-login-buttons'
+import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup } from 'firebase/auth'
+import { auth } from '../../utils/configs'
+import { AuthenticationTokenContext } from '../../contexts/AuthenticationToken'
+
 function LoginPage() {
+  const {setToken} = useContext(AuthenticationTokenContext);
+  
+  useEffect(() => onAuthStateChanged(auth, user => {
+    if (!user) return setToken(null);
+    user.getIdToken().then((token) => {
+      console.log(token);
+      setToken(token);
+    });
+  }), [])
+  const onGoogleLogin = async () => {
+    try{
+      const provider = new GoogleAuthProvider()
+      await signInWithPopup(auth, provider);
+    } catch(e){
+      console.log(e);
+    }
+    
+  }
   return (
     <Box
     sx={{ position: 'absolute', 
@@ -11,16 +35,18 @@ function LoginPage() {
             transform: 'translate(-50%, -50%)',
             borderWidth: 1,
             borderStyle: 'solid',
-            p: 8,
-            width: '25%',
+            p: 4,
+            width: '35%',
         }}
 >
-    
-    <TextField variant='outlined' label='Email' id='email' sx={{mb: 4, width: '100%', backgroundColor: 'primary.light'}}/> <br/>
-    <TextField variant='outlined' label='Password' id='password' sx={{mb: 4, width: '100%', backgroundColor: 'primary.light'}}/>
-    <Button variant='text' sx={{mb: 1}}><Typography variant='h6' fontSize={12} color='blue'>Forgot Password?</Typography></Button><br/>
-    <Link to='/register'><Button variant='text' sx={{mb: 2}}><Typography variant='h6' fontSize={12} color='blue'>Don't have an account? Register Now</Typography></Button></Link><br/>
-    <Button variant='contained'>Login</Button>
+  <Typography variant='h5' sx={{}}>Sign in to</Typography>
+  <Typography variant='h6'>LazyCode</Typography>
+  <Typography variant='h6' sx={{mb: 4}}>Login to use our free resources</Typography>
+  <GoogleLoginButton onClick={onGoogleLogin} />
+  <Box sx={{mb: 2}}/>
+  <FacebookLoginButton />
+  <Box sx={{mb: 2}}/>
+  <TwitterLoginButton></TwitterLoginButton>
   </Box>
   )
 }

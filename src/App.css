@@ -40,3 +40,13 @@
 .read-the-docs {
   color: #888;
 }
+
+.disabledScrollbarContainer {
+  overflow-y: scroll;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+}
+.disabledScrollbarContainer::-webkit-scrollbar { /* WebKit */
+  width: 0;
+  height: 0;
+}

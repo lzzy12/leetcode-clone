@@ -112,7 +112,6 @@ function ProblemEditForm() {
                     mt: 2
                 }}><TextareaAutosize minRows={10} placeholder='Test cases' style={{ width: '100%' }} onChange={(event) => {
                     setTestCases(event.target.value);
-                    console.log('ssdsd');
                 }} value={testCases} /></Box>
             </Grid>
             <Grid xs={6} justifyContent={'start'} sx={{
